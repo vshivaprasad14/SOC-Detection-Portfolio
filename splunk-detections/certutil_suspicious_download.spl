@@ -1,0 +1,12 @@
+index=sysmon sourcetype="XmlWinEventLog"
+(EventID=1)
+(Image="*\\certutil.exe" OR OriginalFileName="CertUtil.exe")
+(CommandLine="*urlcache*" OR CommandLine="*verifyctl*" OR CommandLine="*http*")
+| stats count as ExecutionCount
+        values(CommandLine) as ObservedCommands
+        values(User) as Users
+        values(Computer) as Hosts
+        min(_time) as FirstSeen
+        max(_time) as LastSeen
+| convert ctime(FirstSeen) ctime(LastSeen)
+| where ExecutionCount > 0
